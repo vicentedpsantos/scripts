@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Sets background wallpaper to the argument passed
+
+[ -f "$1" ] && cp "$1" ~/.config/wallpaper.png && notify-send -i "$HOME/.config/wallpaper.png" "Wallpaper changed"
+
+[ -d "$1" ] && cp "$(find "$1"/*.{jpg,jpeg,png} -type f | shuf -n 1)" ~/.config/wallpaper.png && notify-send -i "$HOME/.config/wallpaper.png" "Random wallpaper chosen" 
+# xwallpaper --zoom ~/.config/wallpaper.png
+feh --bg-scale ~/.config/wallpaper.png
