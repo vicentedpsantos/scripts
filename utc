@@ -1,0 +1,7 @@
+#!/usr/bin/env bb
+
+(def now (java.time.ZonedDateTime/now))
+(def IE-timezone (java.time.ZoneId/of "Europe/London"))
+(def IE-time (.withZoneSameInstant now IE-timezone))
+(def pattern (java.time.format.DateTimeFormatter/ofPattern "HH:mm"))
+(println (.format IE-time pattern))
