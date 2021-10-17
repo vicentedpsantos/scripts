@@ -1,0 +1,54 @@
+#!/usr/bin/env bb
+
+;; wtr -c "Porto Alegre"
+
+(ns wtr
+  (:require [clojure.data.json :as json]
+            [clojure.tools.cli :refer [parse-opts]]))
+
+(use 'clojure.string)
+
+(def open-weather-api-key
+  (System/getenv "OPEN_WEATHER_API_KEY"))
+
+(def default-city
+  (or
+    (System/getenv "DEFAULT_CITY")
+    "Cork"))
+
+(def cli-options
+  [["-c" "--city CITY" "Name of city"
+    :default default-city]])
+
+(def input 
+  (:options (parse-opts *command-line-args* cli-options)))
+
+(def sanitized-city
+  (trim (str (:city input))))
+
+(defn weather-by-city-url [city-name api-key]
+  (str "https://api.openweathermap.org/data/2.5/weather"
+       "?q=" city-name
+       "&appid=" api-key))
+
+(def response
+  (json/read-str
+    (slurp
+      (weather-by-city-url sanitized-city open-weather-api-key))))
+
+(defn kelvin-to-celsius [temp]
+  (format "%.2f" (- temp 273.15)))
+
+(defn print-response [response]
+  (let [main (get response "main")
+        weather (first (get response "weather"))]
+    (println sanitized-city)
+    (println "Weather\t\t\t\t" (get weather "main"))
+    (println "Desc\t\t\t\t" (get weather "description"))
+    (println "Temperature\t\t\t" (kelvin-to-celsius (get main "temp")))
+    (println "Temp Min.\t\t\t" (kelvin-to-celsius (get main "temp_min")))
+    (println "Temp Max.\t\t\t" (kelvin-to-celsius (get main "temp_max")))
+    (println "Temp Humidity\t\t\t" (get main "humidity"))
+    (println "Feels like\t\t\t" (kelvin-to-celsius (get main "feels_like")))))
+
+(print-response response)
