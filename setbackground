@@ -8,4 +8,4 @@
 # xwallpaper --zoom ~/.config/wallpaper.png
 # feh --bg-scale ~/.config/wallpaper.png
 wal -c
-wal -i ~/.config/wallpaper.png
+wal -i ~/.config/wallpaper.png --saturate $(echo $2 | bc)
