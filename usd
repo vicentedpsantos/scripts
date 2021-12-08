@@ -1,0 +1,1 @@
+curl -s "https://economia.awesomeapi.com.br/json/last/USD-BRL" |  jq '. | {bidPrice: .USDBRL.bid, from: .EURBRL.code, to: .USDBRL.codein}.bidPrice' | tr -d '"'
