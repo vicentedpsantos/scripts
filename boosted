@@ -1,0 +1,13 @@
+#! /usr/bin/env ruby
+
+# frozen_string_literal: true
+
+require 'nokogiri'
+require 'open-uri'
+
+doc = Nokogiri::HTML(URI.open('https://www.tibia.com/news'))
+
+title = doc.at_css('img#Monster')['title']
+REGEX = /Today's boosted creature: ([a-zA-Z\ ]*)/.freeze
+
+puts REGEX.match(title).captures

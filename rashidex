@@ -1,0 +1,54 @@
+#!/usr/bin/env elixir
+
+Mix.install [:timex]
+
+defmodule Rashid do
+  @server_save_utc 10
+
+  @rashid_places %{
+    monday: "Svargrond",
+    tuesday: "Liberty Bay",
+    wednesday: "Port Hope",
+    thursday: "Ankrahmun",
+    friday: "Darashia",
+    saturday: "Edron",
+    sunday: "Carlin"
+  }
+
+  def location_now do
+    @rashid_places
+    |> Map.fetch(server_save_day())
+  end
+
+  defp server_save_day do
+    cond do
+      before_server_save?() and after_midnight?() ->
+        yesterday()
+      true ->
+        today()
+    end
+    |> Timex.weekday
+    |> Timex.day_name
+    |> String.downcase
+    |> String.to_atom
+  end
+
+  defp today do
+    Timex.today
+  end
+
+  defp yesterday do
+    Timex.today |> Date.add(-1)
+  end
+
+  defp before_server_save? do
+    DateTime.utc_now().hour < @server_save_utc
+  end
+
+  defp after_midnight? do
+    DateTime.utc_now().hour > 0
+  end
+end
+
+{_, location} = Rashid.location_now()
+IO.puts location

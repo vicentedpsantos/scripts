@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'date'
+
+RASHID_PLACES = {
+  monday: 'Svargrond',
+  tuesday: 'Liberty Bay',
+  wednesday: 'Port Hope',
+  thursday: 'Ankrahmun',
+  friday: 'Darashia',
+  saturday: 'Edron',
+  sunday: 'Carlin'
+}.freeze
+
+SERVER_SAVE_HOUR = 9
+
+def before_server_save?
+  Time.now.hour < SERVER_SAVE_HOUR
+end
+
+def after_midnight?
+  Time.now.hour >= 0
+end
+
+def server_save_day
+  return Date.today.prev_day if after_midnight? && before_server_save?
+
+  Date.today
+end
+
+server_save_day.tap do |server_save_day|
+  dayname = server_save_day.strftime('%A').downcase
+
+  puts RASHID_PLACES[dayname.to_sym]
+end
