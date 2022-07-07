@@ -3,7 +3,7 @@
 Mix.install [:timex]
 
 defmodule Rashid do
-  @server_save_utc 10
+  @server_save_utc 9
 
   @rashid_places %{
     monday: "Svargrond",
@@ -42,11 +42,11 @@ defmodule Rashid do
   end
 
   defp before_server_save? do
-    DateTime.utc_now().hour < @server_save_utc
+    Timex.now().hour < @server_save_utc
   end
 
   defp after_midnight? do
-    DateTime.utc_now().hour > 0
+    Timex.now().hour > 0
   end
 end
 
