@@ -46,7 +46,7 @@ defmodule Rashid do
   end
 
   defp after_midnight? do
-    Timex.now().hour > 0
+    Timex.now().hour >= 0
   end
 end
 
