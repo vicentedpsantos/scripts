@@ -7,7 +7,11 @@ require 'open-uri'
 
 doc = Nokogiri::HTML(URI.open('https://www.tibia.com/news'))
 
-title = doc.at_css('img#Monster')['title']
-REGEX = /Today's boosted creature: ([a-zA-Z\ ]*)/.freeze
+if doc.at_css('img#Monster')
+  title = doc.at_css('img#Monster')['title']
+  REGEX = /Today's boosted creature: ([a-zA-Z\ ]*)/.freeze
 
-puts REGEX.match(title).captures
+  puts REGEX.match(title).captures
+else
+  puts 'N/A'
+end

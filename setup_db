@@ -1,0 +1,76 @@
+#!/usr/bin/bash
+
+# Author: vicentedpsantos
+# Date Created: 2022-07-03
+# Last Modified: 2022-07-03
+
+# Description
+# Resets postgresql database
+
+# Usage
+# setup_db
+
+FILE=./Gemfile
+if [ -f "$FILE" ]; then
+    echo "Detected Ruby project..."
+    echo ""
+else 
+    echo "$FILE does not exist."
+    echo "Cd into a Rails app before running this script"
+    exit 1
+fi
+
+databases=$(psql --list | grep UTF8 | awk '{ print $ 1 }')
+
+echo "Select the database to reset:"
+select database_name in $databases
+do
+  echo "Database selected: $database_name"
+  echo ""
+  break
+done
+
+dump_files=$(find $HOME/ -name '*.dump')
+
+echo "Select the dump file"
+select path_to_dump_file in $dump_files
+do
+  echo "Dumpfile selected: $path_to_dump_file"
+  echo ""
+  break
+done
+
+echo ""
+echo ""
+echo "Config:"
+echo "Database name: $database_name"
+echo "Path to dump file: $path_to_dump_file"
+
+read -p "Confirm (Y/y) or Cancel (N/n)" continue_after_config
+
+if [[ "${continue_after_config^}" == Y ]]; then
+  echo "Continuing..."
+else
+  echo "Cancelling..."
+  exit 0
+fi
+
+bundle exec rails db:environment:set RAILS_ENV=development
+
+echo "Dropping DB...\n"
+bundle exec rails db:drop
+
+echo "Recreating DB...\n"
+bundle exec rails db:create
+
+echo "Restoring from dump...\n"
+psql $database_name < $path_to_dump_file
+
+echo "Migrating...\n"
+bundle exec rails db:migrate
+
+echo "Executing Data migrations...\n"
+bundle exec rails data:migrate
+
+echo "Disabling integrations...\n"
+bundle exec rails integrations:disable_all
