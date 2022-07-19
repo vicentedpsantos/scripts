@@ -16,7 +16,7 @@ if [ -f "$FILE" ]; then
     echo ""
 else 
     echo "$FILE does not exist."
-    echo "Cd into a Rails app before running this script"
+    echo "Cd into a Ruby project before running this script"
     exit 1
 fi
 
@@ -25,6 +25,10 @@ databases=$(psql --list | grep UTF8 | awk '{ print $ 1 }')
 echo "Select the database to reset:"
 select database_name in $databases
 do
+  if [ -z "$database_name" ]; then
+    echo "No database selected. Exiting."
+    exit 0
+  fi
   echo "Database selected: $database_name"
   echo ""
   break
@@ -35,6 +39,11 @@ dump_files=$(find $HOME/ -name '*.dump')
 echo "Select the dump file"
 select path_to_dump_file in $dump_files
 do
+  if [ -z "$path_to_dump_file" ]; then
+    echo "No dump selected. Exiting."
+    exit 0
+  fi
+
   echo "Dumpfile selected: $path_to_dump_file"
   echo ""
   break
