@@ -16,13 +16,13 @@ if [ -f "$FILE" ]; then
     echo ""
 else 
     echo "$FILE does not exist."
-    echo "Cd into a Ruby project before running this script"
+    echo "cd into a Ruby project before running this script"
     exit 1
 fi
 
 databases=$(psql --list | grep UTF8 | awk '{ print $ 1 }')
 
-echo "Select the database to reset:"
+PS3="Select the database to reset => "
 select database_name in $databases
 do
   if [ -z "$database_name" ]; then
@@ -36,7 +36,7 @@ done
 
 dump_files=$(find $HOME/ -name '*.dump')
 
-echo "Select the dump file"
+PS3="Select the dump file to reset => "
 select path_to_dump_file in $dump_files
 do
   if [ -z "$path_to_dump_file" ]; then
@@ -55,7 +55,7 @@ echo "Config:"
 echo "Database name: $database_name"
 echo "Path to dump file: $path_to_dump_file"
 
-read -p "Confirm (Y/y) or Cancel (N/n)" continue_after_config
+read -p "Confirm (Y/y) or Cancel (N/n) " continue_after_config
 
 if [[ "${continue_after_config^}" == Y ]]; then
   echo "Continuing..."
