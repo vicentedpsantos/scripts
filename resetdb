@@ -34,7 +34,7 @@ do
   break
 done
 
-dump_files=$(find $HOME/ -name '*.dump')
+dump_files=$(find "$HOME/" -name '*.dump')
 
 PS3="Select the dump file to reset => "
 select path_to_dump_file in $dump_files
@@ -55,20 +55,18 @@ echo "Config:"
 echo "Database name: $database_name"
 echo "Path to dump file: $path_to_dump_file"
 
-read -p "Confirm (Y/y) or Cancel (N/n) " continue_after_config
+read -r -p "Confirm (Y/y) or cancel (N/N) configuration " continue_after_config
 
-if [[ "${continue_after_config^}" == Y ]]; then
-  echo "Continuing..."
-else
-  echo "Cancelling..."
-  exit 0
-fi
+case "$continue_after_config" in
+  [yY]) echo "Continuing...";;
+  [nN]) echo "Cancelling"; exit 0;;
+esac
 
 bundle exec rails db:environment:set RAILS_ENV=development
 
 bundle exec rails db:drop
 bundle exec rails db:create
-psql $database_name < $path_to_dump_file
+psql "$database_name" < "$path_to_dump_file"
 bundle exec rails db:migrate
 bundle exec rails data:migrate
 bundle exec rails integrations:disable_all

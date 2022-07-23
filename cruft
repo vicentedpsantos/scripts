@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+
+# Author: vicentedpsantos
+# Date Created: 2022-07-23
+# Last Modified: 2022-07-23
+
+# Description
+# Delete old files that have been in your
+# directory for too long
+
+# Usage
+# cruft
+
+read -p "How many days old files do you want to delete? " days_ago
+
+number_re='^[0-9]+$'
+if ! [[ $days_ago =~ $number_re ]] ; then
+   echo "error: Not a number" >&2; exit 1
+fi
+
+readarray -t old_files < <(find $(pwd) -maxdepth 1 -atime +$days_ago -type f)
+
+if [ ${#old_files[@]} -le 0 ]; then
+  echo "No files are older than $days_ago days"
+  echo "Exiting..."
+  exit 0
+fi
+
+echo "Files $days_ago days and older:"
+
+for old_file in ${old_files[@]}; do
+  rm -i $old_file
+done
