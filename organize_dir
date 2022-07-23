@@ -1,0 +1,55 @@
+#!/usr/bin/bash
+
+# Author: vicentedpsantos
+# Date Created: 2022-07-23
+# Last Modified: 2022-07-23
+
+# Description
+# Organize file depending on their types
+
+# Usage
+# organize_folder path_to_folder
+
+ls_files=$(ls $1)
+
+read -p "This will reorganize files into separate directories. Proceed? (Yy/Nn) " confirm
+
+if [ "${confirm^}" = Y ]; then
+  echo "Continuing..."
+else
+  echo "Cancelling"
+  exit 0
+fi
+
+for file in $ls_files; do
+  extension=$(echo $file | rev | cut -d . -f 1 | rev)
+
+  case "$extension" in
+    jpg|jpeg|png)
+      dirname="images" ;;
+    doc|docx|txt|pdf)
+      dirname="documents" ;;
+    xls|xlsx|csv)
+      dirname="spreadsheets" ;;
+    sh)
+      dirname="scripts" ;;
+    zip|tar|gz|bz2)
+      dirname="archives" ;;
+    ppt|pptx)
+      dirname="presentations" ;;
+    mp3)
+      dirname="audio" ;;
+    mp4)
+      dirname="video" ;;
+    *)
+      dirname="other" ;;
+
+  esac
+
+  if [ ! -d "$dirname" ]; then
+    mkdir "$dirname" 
+  fi
+
+  mv "$file" "$dirname"
+done
+
