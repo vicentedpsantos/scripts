@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+source="https://discord.com/api/download?platform=linux&format=tar.gz"
+discord_package="discord.tar.gz"
+
+echo "Downloading..."
+curl --progress-bar --location "${source}" > "${HOME}/Downloads/${discord_package}";
+
+echo "Unpacking..."
+cd $HOME
+tar -xzf $HOME/Downloads/$discord_package
+
+echo "Creating symlink"
+sudo ln -s $HOME/Discord/Discord /usr/bin/discord

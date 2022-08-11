@@ -1,0 +1,58 @@
+#!/usr/bin/bash
+
+# Author: vicentedpsantos
+# Date Created: 2022-07-22
+# Last Modified: 2022-07-22
+
+# Description
+# Time to drink some water
+
+# Usage
+# alarm -h 1 -h 1 -s 1
+
+while getopts "h:m:s:" options; do
+  case "$options" in
+    h) hours=$OPTARG;;
+    m) minutes=$OPTARG;;
+    s) seconds=$OPTARG;;
+    ?) echo "Unknown command."; exit 1 ;;
+  esac
+done
+
+echo "Alarm set for $hours hours, $minutes minutes and $seconds seconds"
+
+# to_second hour 2
+function to_seconds() {
+  case $1 in
+    hour)
+      echo $(( $2 * 60 * 60 ));;
+    minute)
+      echo $(( $2 * 60 ));;
+    *)
+      exit 1;;
+  esac
+}
+
+seconds_from_hours=$(to_seconds hour $hours)
+seconds_from_minutes=$(to_seconds minute $minutes)
+
+total_seconds=$(( $seconds_from_hours + $seconds_from_minutes + $seconds ))
+
+while [ $total_seconds -gt 0 ]; do
+  echo $total_seconds
+  sleep 1s
+  total_seconds=$(( $total_seconds - 1 ))
+done
+
+selfloc=$(readlink -f "$0")
+read -n1 -s -r -p $'Press space to snooze and esc to exit...\n' key
+while true; do
+  if [ "$key" = ' ' ]; then
+    exec "$selfloc -h 0 -m 10 - 0" && exit
+  else
+    echo "Exiting"
+  fi
+
+  paplay $HOME/sounds/cold_water_in_mug.ogg
+done
+
