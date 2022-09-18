@@ -15,18 +15,36 @@ data Day = Monday
          | Sunday
          deriving (Eq, Ord, Show, Read, Enum)
 
-type Location = String
+data Location = Svargrond
+              | LibertyBay
+              | PortHope
+              | Ankrahmun
+              | Darashia
+              | Edron
+              | Carlin
+              | LocationNotFound
+
+instance Show Location where
+    show Svargrond  = "Svargrond"
+    show LibertyBay = "Liberty Bay"
+    show PortHope   = "Port Hope"
+    show Ankrahmun  = "Ankrahmun"
+    show Darashia   = "Darashia"
+    show Edron      = "Edron"
+    show Carlin     = "Carlin"
+    show LocationNotFound = "Location not found"
+
 type DayLocations = Map.Map Day Location
 
 locations :: DayLocations
 locations = Map.fromList
-    [ (Monday,    "Svargrond")
-    , (Tuesday,   "Liberty Bay")
-    , (Wednesday, "Port Hope")
-    , (Thursday,  "Ankrahmun")
-    , (Friday,    "Darashia")
-    , (Saturday,  "Edron")
-    , (Sunday,    "Carlin")
+    [ (Monday,    Svargrond)
+    , (Tuesday,   LibertyBay)
+    , (Wednesday, PortHope)
+    , (Thursday,  Ankrahmun)
+    , (Friday,    Darashia)
+    , (Saturday,  Edron)
+    , (Sunday,    Carlin)
     ]
 
 -- toWeekDate numbers the days 1 for Monday to 7 for Sunday.
@@ -46,7 +64,7 @@ virtuallyPrevDay (tod, day)
 
 lookupLocation :: Day -> DayLocations -> Location
 lookupLocation d xs = let maybeDay = Map.lookup d xs
-                      in fromMaybe "Not found" maybeDay
+                      in fromMaybe LocationNotFound maybeDay
 
 main = do
     zt <- getZonedTime
