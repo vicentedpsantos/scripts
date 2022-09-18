@@ -6,7 +6,6 @@ import Data.Time.LocalTime
   (ZonedTime, TimeOfDay, getZonedTime, localDay, localTimeOfDay,
    zonedTimeToLocalTime, todHour)
 
-
 data Day = Monday 
          | Tuesday
          | Wednesday
@@ -42,7 +41,7 @@ timeOfDayDayOfWeek zt = let lt = zonedTimeToLocalTime zt
 
 virtuallyPrevDay :: TimeOfDay -> Day -> Day
 virtuallyPrevDay tod day
-    | todHour tod < 9 = pred day
+    | todHour tod < 9 = if day == Monday then Sunday else pred day
     | otherwise       = day
 
 lookupLocation :: Day -> DayLocations -> Location
