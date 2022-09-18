@@ -39,8 +39,8 @@ timeOfDayDayOfWeek zt = let lt = zonedTimeToLocalTime zt
                             tod = localTimeOfDay lt
                         in (tod, dow)
 
-virtuallyPrevDay :: TimeOfDay -> Day -> Day
-virtuallyPrevDay tod day
+virtuallyPrevDay :: (TimeOfDay, Day) -> Day
+virtuallyPrevDay (tod, day)
     | todHour tod < 9 = if day == Monday then Sunday else pred day
     | otherwise       = day
 
@@ -50,6 +50,5 @@ lookupLocation d xs = let maybeDay = Map.lookup d xs
 
 main = do
     zt <- getZonedTime
-    let (tod, dow) = timeOfDayDayOfWeek zt
-    let virtualDay = virtuallyPrevDay tod dow
-    print $ lookupLocation virtualDay locations
+    let vd = (virtuallyPrevDay . timeOfDayDayOfWeek) zt
+    print $ lookupLocation vd locations
