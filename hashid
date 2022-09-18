@@ -1,14 +1,11 @@
 #!/usr/bin/env runhaskell
+import Data.Maybe
 import qualified Data.Map as Map
-
--- import qualified Data.Time.Clock as Clock
--- import qualified Data.Time.Calendar as Calendar
-
+import Data.Time.Calendar.WeekDate (toWeekDate)
 import Data.Time.LocalTime
   (ZonedTime, TimeOfDay, getZonedTime, localDay, localTimeOfDay,
-   zonedTimeToLocalTime)
+   zonedTimeToLocalTime, todHour)
 
-import Data.Time.Calendar.WeekDate (toWeekDate)
 
 data Day = Monday 
          | Tuesday
@@ -20,29 +17,40 @@ data Day = Monday
          deriving (Eq, Ord, Show, Read, Enum)
 
 type Location = String
-
 type DayLocations = Map.Map Day Location
 
 locations :: DayLocations
 locations = Map.fromList
-    [ (Monday, "Svargrond")
-    , (Tuesday, "Liberty Bay")
+    [ (Monday,    "Svargrond")
+    , (Tuesday,   "Liberty Bay")
     , (Wednesday, "Port Hope")
-    , (Thursday, "Ankrahmun")
-    , (Friday, "Darashia")
-    , (Saturday, "Edron")
-    , (Sunday, "Carlin")
+    , (Thursday,  "Ankrahmun")
+    , (Friday,    "Darashia")
+    , (Saturday,  "Edron")
+    , (Sunday,    "Carlin")
     ]
 
 -- toWeekDate numbers the days 1 for Monday to 7 for Sunday.
 weekDateToDayOfWeek :: (Integer, Int, Int) -> Day
-weekDateToDayOfWeek (_, _, d) = toEnum (d-1)
+weekDateToDayOfWeek (_, _, d) = toEnum (d - 1)
 
-dayOfTheWeek :: ZonedTime -> Day
-dayOfTheWeek zt = let lt = zonedTimeToLocalTime zt
-                  in (weekDateToDayOfWeek . toWeekDate . localDay) lt
+timeOfDayDayOfWeek :: ZonedTime -> (TimeOfDay, Day)
+timeOfDayDayOfWeek zt = let lt = zonedTimeToLocalTime zt
+                            dow = (weekDateToDayOfWeek . toWeekDate . localDay) lt
+                            tod = localTimeOfDay lt
+                        in (tod, dow)
+
+virtuallyPrevDay :: TimeOfDay -> Day -> Day
+virtuallyPrevDay tod day
+    | todHour tod < 9 = pred day
+    | otherwise       = day
+
+lookupLocation :: Day -> DayLocations -> Location
+lookupLocation d xs = let maybeDay = Map.lookup d xs
+                      in fromMaybe "Not found" maybeDay
 
 main = do
     zt <- getZonedTime
-    let dow = dayOfTheWeek zt
-    print $ Map.lookup dow locations
+    let (tod, dow) = timeOfDayDayOfWeek zt
+    let virtualDay = virtuallyPrevDay tod dow
+    print $ lookupLocation virtualDay locations
