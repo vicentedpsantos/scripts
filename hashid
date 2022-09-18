@@ -1,0 +1,48 @@
+#!/usr/bin/env runhaskell
+import qualified Data.Map as Map
+
+-- import qualified Data.Time.Clock as Clock
+-- import qualified Data.Time.Calendar as Calendar
+
+import Data.Time.LocalTime
+  (ZonedTime, TimeOfDay, getZonedTime, localDay, localTimeOfDay,
+   zonedTimeToLocalTime)
+
+import Data.Time.Calendar.WeekDate (toWeekDate)
+
+data Day = Monday 
+         | Tuesday
+         | Wednesday
+         | Thursday
+         | Friday
+         | Saturday
+         | Sunday
+         deriving (Eq, Ord, Show, Read, Enum)
+
+type Location = String
+
+type DayLocations = Map.Map Day Location
+
+locations :: DayLocations
+locations = Map.fromList
+    [ (Monday, "Svargrond")
+    , (Tuesday, "Liberty Bay")
+    , (Wednesday, "Port Hope")
+    , (Thursday, "Ankrahmun")
+    , (Friday, "Darashia")
+    , (Saturday, "Edron")
+    , (Sunday, "Carlin")
+    ]
+
+-- toWeekDate numbers the days 1 for Monday to 7 for Sunday.
+weekDateToDayOfWeek :: (Integer, Int, Int) -> Day
+weekDateToDayOfWeek (_, _, d) = toEnum (d-1)
+
+dayOfTheWeek :: ZonedTime -> Day
+dayOfTheWeek zt = let lt = zonedTimeToLocalTime zt
+                  in (weekDateToDayOfWeek . toWeekDate . localDay) lt
+
+main = do
+    zt <- getZonedTime
+    let dow = dayOfTheWeek zt
+    print $ Map.lookup dow locations
